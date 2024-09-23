@@ -21,7 +21,7 @@ A 2D space battle game around a black Hole
 2. **Install using pip**
    ```bash
    pip3 install .
-   ``
+   ```
 
 3. **Run the game**
    ```bash
