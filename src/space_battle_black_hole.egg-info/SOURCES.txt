@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+setup.py
+src/__init__.py
+src/space_battle_black_hole.egg-info/PKG-INFO
+src/space_battle_black_hole.egg-info/SOURCES.txt
+src/space_battle_black_hole.egg-info/dependency_links.txt
+src/space_battle_black_hole.egg-info/top_level.txt
