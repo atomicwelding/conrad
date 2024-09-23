@@ -1,0 +1,11 @@
+# TODO LIST
+
+* TODO Technical report
+** To be continued
+
+* Coding part
+** Choose a framework for unit testing
+** Choose UI
+*** Make a term
+*** Make a frame for graphics
+*** Make another UI for the options?
