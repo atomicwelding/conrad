@@ -6,10 +6,6 @@
 
 </p>
 
-## Resources
-
-- [Scope statements](rsrc/scope-statements.pdf)
-
 
 ## Installation 
 
@@ -31,3 +27,10 @@
    ```bash
    python3 main.py
    ```
+
+
+   ## Resources
+
+- [Scope statements](rsrc/scope-statements.pdf)
+
+
