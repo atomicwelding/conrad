@@ -1,10 +1,14 @@
 # space-battle-black-hole
-A 2D space battle game around a black Hole
 
+<p align="center">
+   <img src="rsrc/2.jpg" width="600" height="400"></img> <br>
+   A 2D space battle game around a black Hole ! 🛸
+
+</p>
 
 ## Resources
 
-- [Scope statements](scope-statements.pdf)
+- [Scope statements](rsrc/scope-statements.pdf)
 
 
 ## Installation 
