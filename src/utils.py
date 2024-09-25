@@ -100,3 +100,7 @@ class Vec2:
     # Overload len() to return the number of elements (2 for Vec2)
     def __len__(self):
         return 2
+
+
+def Vec2Polar(r: float = 0.0, theta: float = 0.0) -> Vec2:
+    return Vec2(r, theta, polar = True)
