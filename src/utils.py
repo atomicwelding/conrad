@@ -2,9 +2,28 @@ import numpy as np
 
 
 class Vec2:
-
-    def __init__(self, x=0.0, y=0.0):
+    def __init__(self, v1=0.0, v2=0.0, polar=False):
+        if polar:
+            x = v1 * np.cos(v2)
+            y = v1 * np.sin(v2)
+        else:
+            x = v1
+            y = v2
+            
         self.data = np.array([x, y], dtype=float)
+
+    # Convert to polar coordinates
+    def polar(self):
+        """
+        Converts Cartesian coordinates to polar coordinates.
+        
+        Returns:
+        (r, theta): Tuple of radial distance and angle in radians.
+        """
+        x, y = self.data
+        r = np.sqrt(x**2 + y**2)        # Radial distance
+        theta = np.arctan2(y, x)        # Angle in radians
+        return r, theta
 
     # Representation of the vector
     def __repr__(self):
