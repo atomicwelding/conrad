@@ -149,8 +149,3 @@ def Vec2Polar(r: float = 0.0, theta: float = 0.0) -> Vec2:
 def VelVec2Polar(rdot: float = 0.0, thetadot: float = 0.0) -> VelVec2:
     return VelVec2(rdot, thetadot, polar = True)
 
-
-r = Vec2Polar(10,10)
-v = VelVec2Polar(10,13)
-
-print(v.thetadot(r))
