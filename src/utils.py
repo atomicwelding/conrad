@@ -8,9 +8,11 @@ class Vec2:
     _r: float | None = None  # Radial distance (if polar)
     _theta: float | None = None  # Angle in radians (if polar)
     data: np.ndarray = None  # Cartesian (x, y) representation
+    _polar: bool = False
 
     def __init__(self, v1=0.0, v2=0.0, polar=False):
-        if polar:
+        object.__setattr__(self, '_polar', polar)
+        if self._polar:
             # If initialized in polar coordinates, store both polar and Cartesian values
             object.__setattr__(self, '_r', v1)
             object.__setattr__(self, '_theta', v2)
@@ -22,12 +24,16 @@ class Vec2:
 
         object.__setattr__(self, 'data', np.array([x, y], dtype=float))
 
-        # Convert to polar coordinates, but only if initialized in polar coordinates
+    
+    def isPolar(self):
+        return self._polar
+    
+    # Convert to polar coordinates, but only if initialized in polar coordinates
     def polar(self):
         """
         Return the polar coordinates (r, theta).
         """
-        if self._r is not None and self._theta is not None:
+        if self.isPolar() and (self._r is not None and self._theta is not None):
             return self._r, self._theta
         else:
             # If the vector was initialized in Cartesian coordinates and polar not available
@@ -115,25 +121,32 @@ class VelVec2(Vec2):
         super().__init__(v1, v2, polar)
 
     def rdot(self):
-        if self._r is not None and self._theta is not None:
+        if self.isPolar() and (self._r is not None and self._theta is not None): 
             return self._r
         else:
             # If the vector was initialized in Cartesian coordinates and polar not available
             raise ValueError("Polar coordinates were not provided at initialization.")
 
-    def thetadot(self):
-        if self._r is not None and self._theta is not None:
+    def rthetadot(self):
+        if self.isPolar() and (self._r is not None and self._theta is not None):
+            return self._theta
+        else:
+            raise ValueError("Polar coordinates were not provided at initialization.")
+
+    def thetadot(self, r : Vec2):
+        if self.isPolar() and (self._r is not None and self._theta is not None):
             if( self.rdot()  == 0):
                 raise ZeroDivisionError('As rdot = 0, thetadot can\'t be provided')
 
-            return (self._theta / self.rdot())
+            return self._theta / r.norm() 
         else:
             raise ValueError("Polar coordinates were not provided at initialization.")
-        
         
 
 def Vec2Polar(r: float = 0.0, theta: float = 0.0) -> Vec2:
     return Vec2(r, theta, polar = True)
 
-def VelVec2Polar(rdot: float = 0.0, thetadot: float = 0.0) -> VelVec2:
+def VelVec2Polar(r: Vec2, rdot: float = 0.0, thetadot: float = 0.0) -> VelVec2:
     return VelVec2(rdot, thetadot, polar = True)
+
+v = VelVec2(10,10)
