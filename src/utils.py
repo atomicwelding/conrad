@@ -32,7 +32,6 @@ class Vec2:
         else:
             # If the vector was initialized in Cartesian coordinates and polar not available
             raise ValueError("Polar coordinates were not provided at initialization.")
-        
 
     # Representation of the vector
     def __repr__(self):
@@ -110,5 +109,31 @@ class Vec2:
     def __len__(self):
         return 2
 
+
+class VelVec2(Vec2):
+    def __init__(self, v1, v2, polar = False):
+        super().__init__(v1, v2, polar)
+
+    def rdot(self):
+        if self._r is not None and self._theta is not None:
+            return self._r
+        else:
+            # If the vector was initialized in Cartesian coordinates and polar not available
+            raise ValueError("Polar coordinates were not provided at initialization.")
+
+    def thetadot(self):
+        if self._r is not None and self._theta is not None:
+            if( self.rdot()  == 0):
+                raise ZeroDivisionError('As rdot = 0, thetadot can\'t be provided')
+
+            return (self._theta / self.rdot())
+        else:
+            raise ValueError("Polar coordinates were not provided at initialization.")
+        
+        
+
 def Vec2Polar(r: float = 0.0, theta: float = 0.0) -> Vec2:
     return Vec2(r, theta, polar = True)
+
+def VelVec2Polar(rdot: float = 0.0, thetadot: float = 0.0) -> VelVec2:
+    return VelVec2(rdot, thetadot, polar = True)
