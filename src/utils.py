@@ -1,29 +1,38 @@
 import numpy as np
+from dataclasses import dataclass
 
 
+@dataclass(init=True, frozen=True) 
 class Vec2:
+
+    _r: float | None = None  # Radial distance (if polar)
+    _theta: float | None = None  # Angle in radians (if polar)
+    data: np.ndarray = None  # Cartesian (x, y) representation
+
     def __init__(self, v1=0.0, v2=0.0, polar=False):
         if polar:
+            # If initialized in polar coordinates, store both polar and Cartesian values
+            object.__setattr__(self, '_r', v1)
+            object.__setattr__(self, '_theta', v2)
             x = v1 * np.cos(v2)
             y = v1 * np.sin(v2)
         else:
             x = v1
             y = v2
-            
-        self.data = np.array([x, y], dtype=float)
 
-    # Convert to polar coordinates
+        object.__setattr__(self, 'data', np.array([x, y], dtype=float))
+
+        # Convert to polar coordinates, but only if initialized in polar coordinates
     def polar(self):
         """
-        Converts Cartesian coordinates to polar coordinates.
-        
-        Returns:
-        (r, theta): Tuple of radial distance and angle in radians.
+        Return the polar coordinates (r, theta).
         """
-        x, y = self.data
-        r = np.sqrt(x**2 + y**2)        # Radial distance
-        theta = np.arctan2(y, x)        # Angle in radians
-        return r, theta
+        if self._r is not None and self._theta is not None:
+            return self._r, self._theta
+        else:
+            # If the vector was initialized in Cartesian coordinates and polar not available
+            raise ValueError("Polar coordinates were not provided at initialization.")
+        
 
     # Representation of the vector
     def __repr__(self):
@@ -95,12 +104,11 @@ class Vec2:
 
     # Overload abs() to return the length of the vector
     def __abs__(self):
-        return self.length()
+        return self.norm()
 
     # Overload len() to return the number of elements (2 for Vec2)
     def __len__(self):
         return 2
-
 
 def Vec2Polar(r: float = 0.0, theta: float = 0.0) -> Vec2:
     return Vec2(r, theta, polar = True)
