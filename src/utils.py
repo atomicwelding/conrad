@@ -28,13 +28,29 @@ class Vec2:
     def isPolar(self):
         return self._polar
     
-    # Convert to polar coordinates, but only if initialized in polar coordinates
+    # Returns polar is isPolar == true 
     def polar(self):
         """
         Return the polar coordinates (r, theta).
         """
         if self.isPolar() and (self._r is not None and self._theta is not None):
             return self._r, self._theta
+        else:
+            # If the vector was initialized in Cartesian coordinates and polar not available
+            raise ValueError("Polar coordinates were not provided at initialization.")
+
+    def r(self):
+        if self.isPolar() and (self._r is not None and self._theta is not None):
+            return self._r
+        else:
+            # If the vector was initialized in Cartesian coordinates and polar not available
+            raise ValueError("Polar coordinates were not provided at initialization.")
+
+
+
+    def theta(self):
+        if self.isPolar() and (self._r is not None and self._theta is not None):
+            return self._theta
         else:
             # If the vector was initialized in Cartesian coordinates and polar not available
             raise ValueError("Polar coordinates were not provided at initialization.")
@@ -121,17 +137,10 @@ class VelVec2(Vec2):
         super().__init__(v1, v2, polar)
 
     def rdot(self):
-        if self.isPolar() and (self._r is not None and self._theta is not None): 
-            return self._r
-        else:
-            # If the vector was initialized in Cartesian coordinates and polar not available
-            raise ValueError("Polar coordinates were not provided at initialization.")
+        return self.r()
 
     def rthetadot(self):
-        if self.isPolar() and (self._r is not None and self._theta is not None):
-            return self._theta
-        else:
-            raise ValueError("Polar coordinates were not provided at initialization.")
+        return self.theta()
 
     def thetadot(self, r : Vec2):
         if self.isPolar() and (self._r is not None and self._theta is not None):
