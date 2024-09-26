@@ -135,8 +135,8 @@ class VelVec2(Vec2):
 
     def thetadot(self, r : Vec2):
         if self.isPolar() and (self._r is not None and self._theta is not None):
-            if( self.rdot()  == 0):
-                raise ZeroDivisionError('As rdot = 0, thetadot can\'t be provided')
+            if(r.norm == 0):
+                raise ZeroDivisionError('As r = 0, thetadot can\'t be provided')
 
             return self._theta / r.norm() 
         else:
@@ -146,7 +146,11 @@ class VelVec2(Vec2):
 def Vec2Polar(r: float = 0.0, theta: float = 0.0) -> Vec2:
     return Vec2(r, theta, polar = True)
 
-def VelVec2Polar(r: Vec2, rdot: float = 0.0, thetadot: float = 0.0) -> VelVec2:
+def VelVec2Polar(rdot: float = 0.0, thetadot: float = 0.0) -> VelVec2:
     return VelVec2(rdot, thetadot, polar = True)
 
-v = VelVec2(10,10)
+
+r = Vec2Polar(10,10)
+v = VelVec2Polar(10,13)
+
+print(v.thetadot(r))
