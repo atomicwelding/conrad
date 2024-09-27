@@ -1,7 +1,7 @@
 # space-battle-black-hole
 
 <p align="center">
-   <img src="rsrc/2.jpg" width="600" height="400"></img> <br>
+   <img src="resources/2.jpg" width="600" height="400"></img> <br>
    A 2D space battle game around a black Hole ! 🛸
 
 </p>
@@ -31,6 +31,6 @@
 
    ## Resources
 
-- [Scope statements](rsrc/scope-statements.pdf)
+- [Scope statements](resources/scope-statements.pdf)
 
 
