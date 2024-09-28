@@ -22,6 +22,7 @@ def command_handler(command, state_manager = None):
         match parts[0]:
 
             case "exit":
+                state_manager.set('canRun', False)
                 sys.exit()
 
             case "help":
