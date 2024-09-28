@@ -22,11 +22,17 @@ def command_handler(command, state_manager = None):
         match parts[0]:
 
             case "exit":
-                state_manager.set('canRun', False)
+                state_manager.set('shouldExit', True)
                 sys.exit()
 
             case "help":
                 print(help_command)
+
+
+            case "sdev": # only for developers
+                state_manager.set('distance', float(10))
+                state_manager.set('angular_velocity', float(10))
+                state_manager.set('radial_velocity', float(10))
 
             case "list":
                 if(len(parts) > 1 and parts[1] == 'variables'):
@@ -37,17 +43,20 @@ def command_handler(command, state_manager = None):
                 if(len(parts) < 3):
                     print('Please, set variables the proper way : `set var_name var_value`.')
                 else:
-                    if(parts[1] == 'distance'):
-                        state_manager.set('distance', float(parts[2]))
-                    
-                    elif(parts[1] == 'radial_velocity'):
-                        state_manager.set('radial_velocity', float(parts[2]))
-                  
-                    elif(parts[1] == 'angular_velocity'):
-                        state_manager.set('angular_velocity', float(parts[2]))
-                    else:
-                        print('Variable name not known. Type `list variables` to list all the variables.')
-                    
+                    try:
+                        if(parts[1] == 'distance'):
+                            state_manager.set('distance', float(parts[2]))
+                        
+                        elif(parts[1] == 'radial_velocity'):
+                            state_manager.set('radial_velocity', float(parts[2]))
+                        
+                        elif(parts[1] == 'angular_velocity'):
+                            state_manager.set('angular_velocity', float(parts[2]))
+
+                        else:
+                            print('Variable name not known. Type `list variables` to list all the variables.')
+                    except ValueError:
+                        print('Value not valid. Please, use a number.')
 
             case "run":
                 state_manager.set('canRun', state_manager.get('distance')\
