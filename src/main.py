@@ -1,7 +1,7 @@
-from App import App
+from Game import Game
 
 
 if __name__ == "__main__":
-   app = App()
-   app.run()
+   game = Game()
+   game.run()
     

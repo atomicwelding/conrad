@@ -1,3 +1,4 @@
+# features
 from CustomConsole import CustomConsole
 from StateManager import StateManager
 
@@ -6,14 +7,26 @@ from BlackHole import BlackHole
 from Player import Player
 from EntityPool import EntityPool 
 
+
 import pygame
 import threading
 import time
 import sys
-import os 
+import os
 
 
-class App():
+GAME_TITLE = 'conrad'
+
+
+SCREEN_WIDTH = 512
+SCREEN_HEIGHT = 512
+
+ASSETS_PATH = 'assets'
+BACKGROUND_PATH = 'green_bg.png'
+
+
+
+class Game():
     def __init__(self):
         self.sm = StateManager(state = {
             'canRun':False,
@@ -25,51 +38,61 @@ class App():
 
     def console_handler(self):
         console = CustomConsole(state_manager=self.sm)
-        console.interact("Welcome on board.\nType `help` to display a short manual.\nType `list` to list all the commands.")
+        welcome_msg = """Welcome on board.
+        Type `help` to display a short manual.
+        Type `list [commands|variables]` to list all the commands/variables.`
+        """
+        console.interact(welcome_msg)
 
-    def check_shouldExit(self):
+    def should_game_exit(self):
         if(self.sm.get('shouldExit')):
             sys.exit()
 
-    def start_game(self):
-        # wait for init
+    def check(key, callback):
         while True:
-            self.check_shouldExit()
-            if(self.sm.get('canRun')):
+            should_game_exit() 
+            if(self.sm.get(key)):
                 break
 
-        self.game_loop()
-        
-    def game_loop(self):
+        callback()
+            
+
+    def gameloop(self):
         # launch pygame
         pygame.init()
-        screen = pygame.display.set_mode((512, 512))
-        pygame.display.set_caption("Conrad")
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption(GAME_TITLE)
 
-
-
+        # instantiating entities in the pool 
         entity_pool = EntityPool()
         
-        # instantiating entities
         bh = BlackHole()
         entity_pool.add(bh)
+
+        distance = self.sm.get('distance')
+        radial_velocity = self.sm.get('radial_velocity')
+        angular_velocity = self.sm.get('angular_velocity')
         
-        player = Player(rr = self.sm.get('distance'),
-                        rdot = self.sm.get('radial_velocity'),
-                        thetadot = self.sm.get('angular_velocity') / self.sm.get('distance') )
+        player = Player(rr = distance,
+                        rdot = radial_velocity,
+                        thetadot = angular_velocity / radial_velocity)
         entity_pool.add(player)
 
 
-        
+        # setup the background image
+        background = pygame.image.load(os.path.join(ASSETS_PATH,BACKGROUND_PATH)).convert()
+        screen.blit(background, (0,0)) # add background to the scene
 
 
-        background = pygame.image.load(os.path.join('assets', 'green_bg.png')).convert()
-        screen.blit(background, (0,0))
+        # load entities imgs
+
+
+        # update scene
         pygame.display.flip()
         
         # game loop
         while True:
-            self.check_shouldExit()
+            self.should_game_exit()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -83,5 +106,5 @@ class App():
         console_thread = threading.Thread(target=self.console_handler)
         console_thread.start()
 
-        # scene handling
-        self.start_game()
+        # start the game 
+        check('canRun', callback=self.gameloop)

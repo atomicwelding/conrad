@@ -2,16 +2,15 @@ from Ship import *
 
 
 
-""" TODO Fill the initial conditions
-"""
+
 
 class Player(Ship):
     
-    def __init__(self):
-        """ TODO Fill the initial conditions
-        """
-        super().__init__()
+    def __init__(self)
+        super().__init__(img_path = None)
 
-    def draw(self):
-        raise NotImplementedError
+    def draw(self, scene):
+        pass
         
+    def is_colliding(self):
+        pass
