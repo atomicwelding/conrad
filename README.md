@@ -1,4 +1,4 @@
-# space-battle-black-hole
+# Conrad
 
 <p align="center">
    <img src="resources/2.jpg" width="600" height="400"></img> <br>
@@ -14,8 +14,8 @@
    Clone the repository from GitHub:
 
    ```bash
-   git clone https://github.com/atomicwelding/space-battle-black-hole.git
-   cd space-battle-black-hole
+   git clone https://github.com/atomicwelding/conrad.git
+   cd conrad
    ```
    
 2. **Install using pip**
