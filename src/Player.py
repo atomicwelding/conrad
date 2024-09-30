@@ -6,11 +6,10 @@ from Ship import *
 
 class Player(Ship):
     
-    def __init__(self)
-        super().__init__(img_path = None)
+    def __init__(self, mass, rr, rdot, thetadot):
+        super().__init__(img_path = 'placeholder_player.png',
+                         mass = mass, rr = rr, rtheta = 0, rdot = rdot, thetadot = thetadot)
 
-    def draw(self, scene):
-        pass
-        
+            
     def is_colliding(self):
         pass
