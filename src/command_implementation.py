@@ -29,6 +29,7 @@ def sdbg_command(state_manager: StateManager, arg1, arg2):
     state_manager.set('distance', float(10))
     state_manager.set('angular_velocity', float(10))
     state_manager.set('radial_velocity', float(10))
+    
 
 def list_command(state_manager: StateManager, arg1, arg2):
 
@@ -45,11 +46,15 @@ angular_velocity : initial angular velocity
 
 
 def run_command(state_manager: StateManager, arg1, arg2):
-    state_manager.set('canRun',
-                      state_manager.get('distance') and state_manager.get('angular_velocity') and state_manager.get('radial_velocity'))
-    if(not state_manager.get('canRun')):
-        print('Please, set distance, angular_velocity and radial_velocity before running the game.')
+        distance = state_manager.get('distance')
+        angular_velocity = state_manager.get('angular_velocity')
+        radial_velocity = state_manager.get('radial_velocity')
 
+        if(distance != None and angular_velocity != None and radial_velocity != None):
+                state_manager.set('canRun', True)
+
+        if(not state_manager.get('canRun')):
+                print('Please, set distance, angular_velocity and radial_velocity before running the game.')
 
 
 def set_command(state_manager: StateManager, arg1, arg2):
@@ -71,6 +76,9 @@ def set_command(state_manager: StateManager, arg1, arg2):
                 print('Variable name not known. Type `list variables` to list all the variables.')
         except ValueError:
             print('Value not valid. Please, use a number.')
+
+def step_command(state_manager: StateManager, arg1, arg2):
+        state_manager.set('playerTurn', False)
     
 global commands
 commands = {
@@ -110,6 +118,12 @@ commands = {
                 'use': '`sdbg`',
                 'goal': 'debugging purpose only'
         },
+
+        'step': {
+                'command':step_command,
+                'use':'',
+                'goal':''
+        }
 }
 
 
