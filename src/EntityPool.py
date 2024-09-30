@@ -3,7 +3,7 @@ from IEntity import IEntity
 class EntityPool():
 
 
-    def __init__():
+    def __init__(self):
         self.pool = {}
 
 
