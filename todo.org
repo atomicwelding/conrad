@@ -1,11 +1,19 @@
 # TODO LIST
 
+* Faire la version préalpha, en développant un peu les calculs, faire des plots pour le rapport
+* Commencer version alpha
+** Lister les requirements
+** tester leapfrog --> quels soucis éventuels?
+
+
+
 * TODO Technical report
 ** To be continued
 
 * Coding part
-** Choose a framework for unit testing
-** Choose UI
-*** Make a term
-*** Make a frame for graphics
-*** Make another UI for the options?
+** Add rotations
+** Add collisions 
+** Add text
+** Add conditions to win
+** Add physics engine
+
