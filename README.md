@@ -27,6 +27,12 @@
    ```bash
    python3 main.py
    ```
+   
+4. **Extra :** add readline to the console interface.
+   Download `rlwrap` accordingly to your distribution. Then,
+    ```bash
+    rlwrap python3 main.py
+    ```
 
 
    ## Resources
