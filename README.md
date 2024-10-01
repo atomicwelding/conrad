@@ -42,5 +42,6 @@
 - [Scope statements](resources/scope-statements.pdf)
 - [Free assets by AlcWilliam](https://pixel-by-pixel.itch.io/alcwilliam-space-ship-pack)
 - [Background image by Screaming Brain Studios](https://screamingbrainstudios.itch.io/seamless-space-backgrounds)
+- [rlwrap](https://github.com/hanslub42/rlwrap)
 
 
