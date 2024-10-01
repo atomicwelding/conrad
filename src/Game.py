@@ -26,18 +26,27 @@ SCREEN_HEIGHT = 512
 ASSETS_PATH = 'assets'
 BACKGROUND_PATH = 'green_bg.png'
 
+##### TODO
+
+#### RESOUDRE LE PROBLEME DE FACTEUR 
+
 # physical constants
 G = 6.67*10e-11
 c = 1
-R_S = 1
+R_S = 100
 
 # scaling factors
 alpha = 10e-18
 
 # physical quantities
-M = 1/(2*G)
+M = 1/(2*G) 
 m = alpha * M
 mu = M*G
+
+# physical integration 
+dt = 0.01
+T = 1
+nb_steps = int(T / dt)
 
 class Game():
     def __init__(self):
@@ -72,6 +81,12 @@ Type `list [commands|variables]` to list all the commands/variables.`
                 break
 
         callback()
+
+    def init_text(self, txt: str) -> pygame.Surface:
+        font = pygame.font.Font(os.path.join('assets', 'golden-age.ttf'), 34)
+        return font.render(txt, False, (217,0,210))
+        
+        
             
 
     def gameloop(self):
@@ -80,62 +95,61 @@ Type `list [commands|variables]` to list all the commands/variables.`
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption(GAME_TITLE)
 
-        # instantiating entities in the pool 
+        # create some text
+        pygame.font.init()
+        
+        text_your_turn = self.init_text('Your turn!')
+        text_computing = self.init_text('Computing new positions ...')
+
+        # instantiating entities in the pool
         entity_pool = EntityPool()
 
         bh = BlackHole(mass = M, R_S = R_S)
-        entity_pool.add(bh)
 
         distance = self.sm.get('distance')
         radial_velocity = self.sm.get('radial_velocity')
         angular_velocity = self.sm.get('angular_velocity')
-        
+
         player = Player(mass = m,
                         rr = distance,
-                        rdot = radial_velocity,
-                        thetadot = angular_velocity / radial_velocity)
+                        rdot = radial_velocity ,
+                        thetadot = angular_velocity / distance)
         entity_pool.add(player)
 
-
+      
         target = Target(mass = m,
                         rr = distance,
-                        rdot = radial_velocity,
-                        thetadot = angular_velocity / radial_velocity)
+                        rdot = radial_velocity ,
+                        thetadot = angular_velocity / distance)
         entity_pool.add(target)
 
 
         # setup the background image
         background = pygame.image.load(os.path.join(ASSETS_PATH,BACKGROUND_PATH)).convert()
-        screen.blit(background, (0,0)) # add background to the scene
+        screen.blit(background, (0,0))
 
 
-        # load entities imgs
-        sfbh = bh.load()
-        sfplayer = player.load()
-        sftarget = target.load()
 
-
-        # draw
-        for entity in entity_pool.pool:
-            entity_pool.pool[entity].draw(screen) # ugly
-
-            
-        # update scene
-        pygame.display.flip()
+        # en attendant
+        radial_acc = lambda entity: ( - G*M/entity.rr**2 ) + (entity.rr - 3/2 * R_S) * (entity.l0**2)/(entity.rr**4)
         
         # game loop
         while True:
             self.should_game_exit()
 
-            if(not self.sm.get('playerTurn')):
-                player.rtheta += np.pi/3
-                self.sm.set('playerTurn', True)
-                
-                screen.blit(background, (0,0))
-                for entity in entity_pool.pool:
-                    entity_pool.pool[entity].draw(screen) # ugly
-                pygame.display.flip()
+            #if(not self.sm.get('playerTurn')): # quand c pas mon tour
+            #for k in range(nb_steps):
+            screen.blit(background, (0,0))
+            screen.blit(text_computing, (0,0))
+            bh.draw(screen) # we do not add black hole to entity pool to prevent it to be updated
+            for entity in entity_pool.pool:
+                entity_pool.pool[entity].draw(screen)
+                entity_pool.pool[entity].update(screen, radial_acc, dt)
+                   
             
+            pygame.display.flip()
+                        
+                #self.sm.set('playerTurn', True)
 
             
             for event in pygame.event.get():
