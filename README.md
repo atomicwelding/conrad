@@ -11,6 +11,7 @@
 
 
 1. **Clone the Repository**:
+   
    Clone the repository from GitHub:
 
    ```bash
@@ -29,6 +30,7 @@
    ```
    
 4. **Extra :** add readline to the console interface.
+   
    Download `rlwrap` accordingly to your distribution. Then,
     ```bash
     rlwrap python3 main.py
