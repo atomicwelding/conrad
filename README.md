@@ -2,7 +2,7 @@
 
 <p align="center">
    <img src="resources/2.jpg" width="600" height="400"></img> <br>
-   A 2D space battle game around a black Hole ! 🛸
+   A 2D space battle game around a black hole ! 🛸
 
 </p>
 
