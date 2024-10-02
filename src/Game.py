@@ -122,7 +122,7 @@ Type `list [commands|variables]` to list all the commands/variables.`
                         rr = distance,
                         rdot = radial_velocity ,
                         thetadot = angular_velocity / distance)
-        entity_pool.add(target)
+        #entity_pool.add(target)
 
 
         # setup the background image
@@ -139,33 +139,43 @@ Type `list [commands|variables]` to list all the commands/variables.`
 
         # en attendant
         radial_acc = lambda entity: ( - G*M/entity.rr**2 ) + (entity.rr - 3/2 * R_S) * (entity.l0**2)/(entity.rr**4)
+
         # game loop
         while True:
             self.should_game_exit()
 
-            if(not self.sm.get('playerTurn')): # quand c pas mon tour
+            if(not self.sm.get('playerTurn')): # when computations are made ...
                 for k in range(nb_steps):
                     screen.blit(background, (0,0))
                     screen.blit(text_computing, (0,0))
+
                     for entity in entity_pool.pool:
+                        # update quantities
                         current = entity_pool.pool[entity]
                         current.update(screen, radial_acc, dt)
                         current.draw(screen)
 
+                        # test for collisions
                         for other_entity in entity_pool.pool:
                             other_current = entity_pool.pool[other_entity]
                             if(current.id != other_entity and current.is_colliding_with(other_current)): # take advantage of lazyness
-                                print('collision')
+                                pass
+
                     pygame.display.flip()
                     
                 #self.sm.set('playerTurn', True)
-            else:
+
+
+            else: # in player's turn, just redraw objects at the same place
                 screen.blit(background, (0,0))
                 screen.blit(text_your_turn, (0,0))
                 bh.draw(screen)
                 for entity in entity_pool.pool:
                     entity_pool.pool[entity].draw(screen)
                 pygame.display.flip()
+
+
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

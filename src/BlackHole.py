@@ -12,3 +12,7 @@ class BlackHole(IEntity):
 
     def update(self, scene, radial_acceleration, dt):
         pass
+
+    def is_colliding_with(self, entity):
+        if(super().is_colliding_with(entity)):
+            print("entity should be destroyed")
