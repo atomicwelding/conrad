@@ -102,9 +102,36 @@ class Game():
         self.entity_pool.add(self.target)
 
 
+    # handler for the console part
+    def console_handler(self):
+        console = CustomConsole(state_manager=self.sm)
+        welcome_msg = """
+Welcome on board.
+Type `help` to display a short manual.
+Type `list [commands|variables]` to list all the commands/variables.`
+"""
+        console.interact(welcome_msg)
 
+
+
+    # utils 
+    def should_game_exit(self):
+        if(self.sm.get('shouldExit')):
+            sys.exit()
+       
+    def check(self, key, callback):
+        while True:
+            self.should_game_exit() 
+            if(self.sm.get(key)):
+                break
+        callback()
+
+    def init_text(self, txt: str, size = 34) -> pygame.Surface:
+        font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), size)
+        return font.render(txt, False, (217,0,210))
+    
         
-
+    # dynamics & rendering
     def update_entities(self):
         # iterate over entities
         for entity in self.entity_pool.pool:
@@ -120,10 +147,6 @@ class Game():
                 if(not other_current.palive or current.id == other_entity):
                     continue    
                 current.is_colliding_with(other_current)
-                        
-
-
-
 
                 
     def draw_scene(self):
@@ -135,9 +158,7 @@ class Game():
         pygame.display.flip()
 
 
-
-        
-        
+   
     def gameloop(self):
         distance = self.sm.get('distance')
         angular_velocity = self.sm.get('angular_velocity')
@@ -187,37 +208,7 @@ class Game():
                     pygame.quit()
                     sys.exit()
 
-
-        
-        
-    def console_handler(self):
-        console = CustomConsole(state_manager=self.sm)
-        welcome_msg = """
-Welcome on board.
-Type `help` to display a short manual.
-Type `list [commands|variables]` to list all the commands/variables.`
-"""
-        console.interact(welcome_msg)
-
-    def should_game_exit(self):
-        if(self.sm.get('shouldExit')):
-            sys.exit()
-       
-    def check(self, key, callback):
-        while True:
-            self.should_game_exit() 
-            if(self.sm.get(key)):
-                break
-
-        callback()
-
-    def init_text(self, txt: str, size = 34) -> pygame.Surface:
-        font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), size)
-        return font.render(txt, False, (217,0,210))
-
-   
-
-        
+    # entry point
     def run(self):
 
         # player console
