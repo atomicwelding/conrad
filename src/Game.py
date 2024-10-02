@@ -53,7 +53,7 @@ class Game():
         self.sm = StateManager(state = {
             'canRun':False,
             'shouldExit':False,
-            'playerTurn':True,
+            'playerTurn':False,
 
             
             'distance':None,
@@ -73,7 +73,7 @@ Type `list [commands|variables]` to list all the commands/variables.`
     def should_game_exit(self):
         if(self.sm.get('shouldExit')):
             sys.exit()
-
+       
     def check(self, key, callback):
         while True:
             self.should_game_exit() 
@@ -82,12 +82,20 @@ Type `list [commands|variables]` to list all the commands/variables.`
 
         callback()
 
-    def init_text(self, txt: str) -> pygame.Surface:
-        font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), 34)
+    def init_text(self, txt: str, size = 34) -> pygame.Surface:
+        font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), size)
         return font.render(txt, False, (217,0,210))
-        
-        
-            
+
+    def has_won(self, scene, predicate):
+        msg = "You won"
+        if(not predicate):
+            msg = "You lose"
+
+        text_exiting = self.init_text(msg, size = 100)
+        w,h = text_exiting.get_size()
+        scene.blit(text_exiting, (SCREEN_WIDTH//2 - w//2, SCREEN_HEIGHT//2 - h // 2))
+        pygame.display.flip()
+        self.sm.set('shouldExit', True)  
 
     def gameloop(self):
         # launch pygame
@@ -115,14 +123,14 @@ Type `list [commands|variables]` to list all the commands/variables.`
                         rr = distance,
                         rdot = radial_velocity ,
                         thetadot = angular_velocity / distance)
-        entity_pool.add(player)
+        #entity_pool.add(player)
 
       
         target = Target(mass = m,
                         rr = distance,
                         rdot = radial_velocity ,
                         thetadot = angular_velocity / distance)
-        #entity_pool.add(target)
+        entity_pool.add(target)
 
 
         # setup the background image
@@ -142,8 +150,8 @@ Type `list [commands|variables]` to list all the commands/variables.`
 
         # game loop
         while True:
-            self.should_game_exit()
 
+                                   
             if(not self.sm.get('playerTurn')): # when computations are made ...
                 for k in range(nb_steps):
                     screen.blit(background, (0,0))
@@ -174,6 +182,12 @@ Type `list [commands|variables]` to list all the commands/variables.`
                     entity_pool.pool[entity].draw(screen)
                 pygame.display.flip()
 
+
+
+            # check exiting conditions
+            if(not player.palive or not target.palive):
+                self.has_won(screen, player.palive)                
+            self.should_game_exit()
 
 
             for event in pygame.event.get():

@@ -24,6 +24,7 @@ class IEntity(ABC):
         self.rtheta = rtheta
         self.rdot = rdot
         self.thetadot = thetadot
+        self.palive = True
 
         self.l0 = self.rr**2 * self.thetadot
 

@@ -1,5 +1,8 @@
 from IEntity import *
 
+from Player import Player
+from Target import Target
+
 
 
 class BlackHole(IEntity):
@@ -14,5 +17,13 @@ class BlackHole(IEntity):
         pass
 
     def is_colliding_with(self, entity):
-        if(super().is_colliding_with(entity)):
-            print("entity should be destroyed")
+        #if(super().is_colliding_with(entity)):
+         #   print("entity should be destroyed")
+
+        pcolliding = super().is_colliding_with(entity)
+
+        if(pcolliding and isinstance(entity, Player)):
+            entity.palive = False
+
+        elif(pcolliding and isinstance(entity, Target)):
+            entity.palive = False
