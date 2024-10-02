@@ -1,4 +1,6 @@
 from StateManager import StateManager
+
+import numpy as np
 import sys
 
 
@@ -26,9 +28,45 @@ def help_command(state_manager: StateManager, arg1, arg2):
 
 
 def sdbg_command(state_manager: StateManager, arg1, arg2):
-    state_manager.set('distance', float(10))
-    state_manager.set('angular_velocity', float(10))
-    state_manager.set('radial_velocity', float(10))
+    state_manager.set('distance', 130 )
+    state_manager.set('angular_velocity', 2.0)
+    state_manager.set('radial_velocity', +20.)
+
+def shoot_command(state_manager: StateManager, arg1, arg2):
+        if(not state_manager.get('canRun')):
+                print('Game is not running.')
+                return
+        if(not state_manager.get('playerTurn')):
+                print('Wait for your turn')
+                return
+
+        
+        if(arg1 not in ['heavy', 'light']):
+                print("Not a valid projectile type")
+                return
+
+        if(arg1 == 'heavy' and not state_manager.get('playerCanShootHeavy')):
+                print("No heavy ammo left")
+                return
+        if(arg1 == 'light' and not state_manager.get('playerCanShootLight')):
+                print("No light ammo left")
+                return
+
+        state_manager.set('playerShotType', arg1)
+        try:
+                angle = float(arg2)
+                state_manager.set('playerShotAngle', angle)
+        except ValueError:
+                print('Please, provide a valid angle')
+                return
+        except TypeError:
+                print('Please, provide an angle')
+                return
+
+        state_manager.set('playerShot', True)
+
+        # next step 
+        step_command(state_manager, arg1, arg1)
     
 
 def list_command(state_manager: StateManager, arg1, arg2):
@@ -79,7 +117,17 @@ def set_command(state_manager: StateManager, arg1, arg2):
 
 def step_command(state_manager: StateManager, arg1, arg2):
         state_manager.set('playerTurn', False)
-    
+
+def wait_command(state_manager: StateManager, arg1, arg2):
+        if(not state_manager.get('canRun')):
+                print('Game is not running.')
+                return
+        if(not state_manager.get('playerTurn')):
+                print('Wait for your turn')
+                return
+
+        step_command(state_manager, arg1, arg2)
+        
 global commands
 commands = {
         
@@ -118,11 +166,15 @@ commands = {
                 'use': '`sdbg`',
                 'goal': 'debugging purpose only'
         },
-
-        'step': {
-                'command':step_command,
-                'use':'',
-                'goal':''
+        'shoot': {
+                'command':shoot_command,
+                'use': '`shot [heavy|light] angle_multiple_of_pi`',
+                'goal': 'shot a projectile'
+        },
+        'wait' : {
+                'command':wait_command,
+                'use':'`wait`',
+                'goal': 'wait for a more favorable position'
         }
 }
 

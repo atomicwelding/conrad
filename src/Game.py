@@ -7,6 +7,8 @@ from BlackHole import BlackHole
 from Player import Player
 from EntityPool import EntityPool
 from Target import Target
+from HeavyProjectile import HeavyProjectile
+from LightProjectile import LightProjectile
 
 
 import numpy as np
@@ -20,8 +22,8 @@ import os
 GAME_TITLE = 'conrad'
 
 
-SCREEN_WIDTH = 512
-SCREEN_HEIGHT = 512
+SCREEN_WIDTH = 768
+SCREEN_HEIGHT = 768
 
 ASSETS_PATH = 'assets'
 BACKGROUND_PATH = 'green_bg.png'
@@ -33,6 +35,8 @@ R_S = 100
 
 # scaling factors
 alpha = 10e-18
+beta = 10e-1
+gamma = 10e-2
 
 # physical quantities
 M = 1/(2*G) 
@@ -43,7 +47,7 @@ radial_acc = lambda entity: ( - G*M/entity.rr**2 ) + (entity.rr - 3/2 * R_S) * (
 
 # physical integration 
 dt = 0.01
-T = 2
+T = 4
 nb_steps = int(T / dt)
 
 
@@ -57,7 +61,11 @@ class Game():
             'shouldExit':False,
             'playerTurn':False,
 
+            'playerCanShootHeavy': True,
+            'playerCanShootLight': True,
             'playerShot': False,
+            'playerShotType': None,
+            'playerShotAngle': None, 
             
             'distance':None,
             'angular_velocity':None,
@@ -68,7 +76,7 @@ class Game():
         # init pygame & scene
         pygame.init()
         pygame.font.init() 
-        self.scene = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+        self.scene = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # init some helper msgs 
         self.text_your_turn = self.init_text('Your turn!')
@@ -130,9 +138,46 @@ Type `list [commands|variables]` to list all the commands/variables.`
         font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), size)
         return font.render(txt, False, (217,0,210))
     
+
+    def handle_player_shot(self):
+
+        self.sm.set('playerCanShootHeavy', self.player.nb_heavy_missile_left > 0)
+        self.sm.set('playerCanShootLight', self.player.nb_light_missile_left > 0)
         
+        if(self.sm.get('playerShot')):
+            angle_input =  self.sm.get('playerShotAngle')
+
+
+            # Calculate the projectile's initial position relative to the player's current position and angle_input
+            xprojectile = self.player.x() + 20  * np.cos(self.player.rtheta + angle_input)
+            yprojectile = self.player.y() + 20  * np.sin(self.player.rtheta + angle_input)
+
+            # Convert the new projectile position back to polar coordinates for the game's system
+            rr = np.sqrt(xprojectile**2 + yprojectile**2)
+            rtheta = np.atan2(yprojectile, xprojectile)
+            
+            type_projectile = self.sm.get('playerShotType')
+            
+            if(type_projectile == 'heavy'):
+                projectile = HeavyProjectile(beta*m, rr, rtheta)
+                self.player.nb_heavy_missile_left -= 1
+            else:
+                projectile = LightProjectile(gamma*m, rr, rtheta)
+                self.player.nb_light_missile_left -= 1
+
+            self.entity_pool.add(projectile)
+
+            self.sm.set('playerShot', False)
+            self.sm.set('playerShotType', None)
+            self.sm.set('playerShotAngle', None)
+
+
+    
     # dynamics & rendering
     def update_entities(self):
+
+        self.handle_player_shot()
+
         # iterate over entities
         for entity in self.entity_pool.pool:
             current = self.entity_pool.pool[entity]
@@ -174,7 +219,7 @@ Type `list [commands|variables]` to list all the commands/variables.`
         self.target.rtheta = np.pi
         self.target.rdot = radial_velocity
         self.target.thetadot = angular_velocity / distance
-
+        
         self.draw_scene()
 
         while True:
