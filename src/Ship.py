@@ -6,7 +6,3 @@ class Ship(IEntity):
         
         self.nb_heavy_missile_left = 1
         self.nb_light_missile_left = 1
-
-    
-    def is_colliding(self):
-        pass 

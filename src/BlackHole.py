@@ -9,7 +9,6 @@ class BlackHole(IEntity):
                          rr = 0, rtheta = 0,
                          rdot = 0, thetadot = 0)
         self.R_S = R_S
-        
-    
-    def is_colliding(self):
-        pass 
+
+    def update(self, scene, radial_acceleration, dt):
+        pass

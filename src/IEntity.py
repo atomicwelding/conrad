@@ -86,6 +86,7 @@ class IEntity(ABC):
     def draw(self, scene):
         scene.blit(self.surface, self.pyg_coords(scene))
 
-    @abstractmethod
-    def is_colliding(self):
-        pass
+    def is_colliding_with(self, entity) -> bool:
+        rectA = self.surface.get_rect(center=(self.x(), self.y()))
+        rectB = entity.surface.get_rect(center=(entity.x(), entity.y()))
+        return rectA.colliderect(rectB)

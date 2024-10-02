@@ -83,7 +83,7 @@ Type `list [commands|variables]` to list all the commands/variables.`
         callback()
 
     def init_text(self, txt: str) -> pygame.Surface:
-        font = pygame.font.Font(os.path.join('assets', 'golden-age.ttf'), 34)
+        font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), 34)
         return font.render(txt, False, (217,0,210))
         
         
@@ -105,6 +105,7 @@ Type `list [commands|variables]` to list all the commands/variables.`
         entity_pool = EntityPool()
 
         bh = BlackHole(mass = M, R_S = R_S)
+        entity_pool.add(bh)
 
         distance = self.sm.get('distance')
         radial_velocity = self.sm.get('radial_velocity')
@@ -126,32 +127,45 @@ Type `list [commands|variables]` to list all the commands/variables.`
 
         # setup the background image
         background = pygame.image.load(os.path.join(ASSETS_PATH,BACKGROUND_PATH)).convert()
+
+        # init the scene
         screen.blit(background, (0,0))
+        screen.blit(text_computing, (0,0))
+        for entity in entity_pool.pool:
+                        entity_pool.pool[entity].draw(screen)
+        pygame.display.flip()
 
 
 
         # en attendant
         radial_acc = lambda entity: ( - G*M/entity.rr**2 ) + (entity.rr - 3/2 * R_S) * (entity.l0**2)/(entity.rr**4)
-        
         # game loop
         while True:
             self.should_game_exit()
 
-            #if(not self.sm.get('playerTurn')): # quand c pas mon tour
-            #for k in range(nb_steps):
-            screen.blit(background, (0,0))
-            screen.blit(text_computing, (0,0))
-            bh.draw(screen) # we do not add black hole to entity pool to prevent it to be updated
-            for entity in entity_pool.pool:
-                entity_pool.pool[entity].draw(screen)
-                entity_pool.pool[entity].update(screen, radial_acc, dt)
-                   
-            
-            pygame.display.flip()
-                        
-                #self.sm.set('playerTurn', True)
+            if(not self.sm.get('playerTurn')): # quand c pas mon tour
+                for k in range(nb_steps):
+                    screen.blit(background, (0,0))
+                    screen.blit(text_computing, (0,0))
+                    for entity in entity_pool.pool:
+                        current = entity_pool.pool[entity]
+                        current.update(screen, radial_acc, dt)
+                        current.draw(screen)
 
-            
+                        for other_entity in entity_pool.pool:
+                            other_current = entity_pool.pool[other_entity]
+                            if(current.id != other_entity and current.is_colliding_with(other_current)): # take advantage of lazyness
+                                print('collision')
+                    pygame.display.flip()
+                    
+                #self.sm.set('playerTurn', True)
+            else:
+                screen.blit(background, (0,0))
+                screen.blit(text_your_turn, (0,0))
+                bh.draw(screen)
+                for entity in entity_pool.pool:
+                    entity_pool.pool[entity].draw(screen)
+                pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
