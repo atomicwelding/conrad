@@ -1,4 +1,5 @@
 from StateManager import StateManager
+from params import * 
 
 import numpy as np
 import sys
@@ -27,46 +28,7 @@ def help_command(state_manager: StateManager, arg1, arg2):
 
 
 
-def sdbg_command(state_manager: StateManager, arg1, arg2):
-    state_manager.set('distance', 130 )
-    state_manager.set('angular_velocity', 2.0)
-    state_manager.set('radial_velocity', +20.)
 
-def shoot_command(state_manager: StateManager, arg1, arg2):
-        if(not state_manager.get('canRun')):
-                print('Game is not running.')
-                return
-        if(not state_manager.get('playerTurn')):
-                print('Wait for your turn')
-                return
-
-        
-        if(arg1 not in ['heavy', 'light']):
-                print("Not a valid projectile type")
-                return
-
-        if(arg1 == 'heavy' and not state_manager.get('playerCanShootHeavy')):
-                print("No heavy ammo left")
-                return
-        if(arg1 == 'light' and not state_manager.get('playerCanShootLight')):
-                print("No light ammo left")
-                return
-
-        state_manager.set('playerShotType', arg1)
-        try:
-                angle = float(arg2)
-                state_manager.set('playerShotAngle', angle)
-        except ValueError:
-                print('Please, provide a valid angle')
-                return
-        except TypeError:
-                print('Please, provide an angle')
-                return
-
-        state_manager.set('playerShot', True)
-
-        # next step 
-        step_command(state_manager, arg1, arg1)
     
 
 def list_command(state_manager: StateManager, arg1, arg2):
@@ -115,8 +77,53 @@ def set_command(state_manager: StateManager, arg1, arg2):
         except ValueError:
             print('Value not valid. Please, use a number.')
 
+
+def sdbg_command(state_manager: StateManager, arg1, arg2):
+    state_manager.set('distance', 2 * R_S)
+    state_manager.set('angular_velocity', 20.0)
+    state_manager.set('radial_velocity', 0)
+
+
+def shoot_command(state_manager: StateManager, arg1, arg2):
+        if(not state_manager.get('canRun')):
+                print('Game is not running.')
+                return
+        if(not state_manager.get('playerTurn')):
+                print('Wait for your turn')
+                return
+
+        
+        if(arg1 not in ['heavy', 'light']):
+                print("Not a valid projectile type")
+                return
+
+        if(arg1 == 'heavy' and not state_manager.get('playerCanShootHeavy')):
+                print("No heavy ammo left")
+                return
+        if(arg1 == 'light' and not state_manager.get('playerCanShootLight')):
+                print("No light ammo left")
+                return
+
+        state_manager.set('playerShotType', arg1)
+        try:
+                angle = float(arg2) * np.pi
+                state_manager.set('playerShotAngle', angle)
+        except ValueError:
+                print('Please, provide a valid multiple of pi')
+                return
+        except TypeError:
+                print('Please, provide an angle')
+                return
+
+        state_manager.set('playerShot', True)
+
+        # next step 
+        step_command(state_manager, arg1, arg1)
+
+
 def step_command(state_manager: StateManager, arg1, arg2):
         state_manager.set('playerTurn', False)
+
 
 def wait_command(state_manager: StateManager, arg1, arg2):
         if(not state_manager.get('canRun')):
@@ -157,7 +164,7 @@ commands = {
 
         'set': {
                 'command': set_command,
-                'use': '`set [distance|angular_velocity|radial_velocity]`',
+                'use': '`set [distance (as multiple of variable)|angular_velocity|radial_velocity]`',
                 'goal': 'set a value to a given variable'
         },
 

@@ -22,8 +22,5 @@ class BlackHole(IEntity):
 
         pcolliding = super().is_colliding_with(entity)
 
-        if(pcolliding and isinstance(entity, Player)):
-            entity.palive = False
-
-        elif(pcolliding and isinstance(entity, Target)):
+        if(pcolliding and isinstance(entity, IEntity)):
             entity.palive = False

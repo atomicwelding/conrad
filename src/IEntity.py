@@ -1,3 +1,5 @@
+from params import * 
+
 from abc import ABC, abstractmethod
 from uuid import uuid4
 import numpy as np
@@ -7,7 +9,7 @@ import os
 import pygame
 
 
-ASSETS_PATH = "assets"
+
 
 
 class IEntity(ABC):
@@ -26,12 +28,15 @@ class IEntity(ABC):
         self.thetadot = thetadot
         self.palive = True
 
-        self.l0 = self.rr**2 * self.thetadot
-
+        self.l0 = self.rr ** 2 * self.thetadot
+        
         self.img_path = img_path
 
         self.surface = self.load()
 
+
+    def init(self):
+        self.l0 = self.rr ** 2 * self.thetadot
 
     def radial_velocity(self):
         return self.rdot
@@ -44,6 +49,11 @@ class IEntity(ABC):
 
     def velocity(self):
         return np.sqrt(self.radial_velocity()** 2 + self.angular_velocity()**2)
+
+    def radius(self):
+        # Define radius as a fraction of the surface's width, or use a custom value
+        sfw, sfh = self.surface.get_size()
+        return (sfw + sfh) / 4  # Example: half the average dimension of the surface
 
 
     def load(self) -> pygame.Surface :
@@ -82,8 +92,8 @@ class IEntity(ABC):
         elif(self.x() >= scw/2 or self.y() >= sch/2):
             self.rtheta -= np.pi
             self.rdot *= -1
-        
-    
+
+            
     def draw(self, scene):
         scene.blit(self.surface, self.pyg_coords(scene))
 
@@ -91,3 +101,43 @@ class IEntity(ABC):
         rectA = self.surface.get_rect(center=(self.x(), self.y()))
         rectB = entity.surface.get_rect(center=(entity.x(), entity.y()))
         return rectA.colliderect(rectB)
+
+    def assign_result_collisions(self, other):
+        m1 = self.mass
+        m2 = other.mass
+
+        T1 = self.angular_velocity()
+        T2 = other.angular_velocity()
+
+        v1 = self.radial_velocity()
+        v2 = other.radial_velocity()
+
+        # Compute post-collision angles and velocities
+        T1prime = np.atan(((m1 - m2) / (m1 + m2)) * np.tan(T1) + (2 * m2 / (m1 + m2)) * (v2 / v1) * np.sin(T2) / np.cos(T1))
+        v1prime = np.sqrt((((m1 - m2) / (m1 + m2)) * v1 * np.sin(T1) + (2 * m2 / (m1 + m2)) * v2 * np.sin(T2)) ** 2 + (v1 * np.cos(T1)) ** 2)
+        
+        T2prime = np.atan(((m2 - m1) / (m1 + m2)) * np.tan(T2) + (2 * m1 / (m1 + m2)) * (v1 / v2) * np.sin(T1) / np.cos(T2))
+        v2prime = np.sqrt((((m2 - m1) / (m1 + m2)) * v2 * np.sin(T2) + (2 * m1 / (m1 + m2)) * v1 * np.sin(T1)) ** 2 + (v2 * np.cos(T2)) ** 2)
+
+        self.rdot = v1prime
+        self.thetadot = T1prime / self.rr
+
+        other.rdot = v2prime
+        other.thetadot = T2prime / other.rr
+        
+        # --- Position Correction to Avoid Overlap ---
+        # Calculate the distance between the two ships using polar coordinates
+        distance = np.sqrt(self.rr**2 + other.rr**2 - 2*self.rr*other.rr*np.cos(self.rtheta - other.rtheta))
+
+        # Sum of radii to check for overlap
+        overlap_distance = self.radius() + other.radius() - distance
+
+        if overlap_distance > 0:  # If there's an overlap
+            # Unit vector direction in polar coordinates
+            direction_rtheta = (self.rtheta - other.rtheta) / distance
+        
+            # Push each ship apart by half the overlap distance
+            self.rr += overlap_distance / 2
+            other.rr -= overlap_distance / 2
+
+        

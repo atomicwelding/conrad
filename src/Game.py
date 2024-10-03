@@ -11,6 +11,9 @@ from HeavyProjectile import HeavyProjectile
 from LightProjectile import LightProjectile
 
 
+from params import * 
+
+
 import numpy as np
 import pygame
 import threading
@@ -18,48 +21,13 @@ import time
 import sys
 import os
 
-
-GAME_TITLE = 'conrad'
-
-
-SCREEN_WIDTH = 768
-SCREEN_HEIGHT = 768
-
-ASSETS_PATH = 'assets'
-BACKGROUND_PATH = 'green_bg.png'
-
-# physical constants
-G = 6.67*10e-11
-c = 1
-R_S = 100
-
-# scaling factors
-alpha = 10e-18
-beta = 10e-1
-gamma = 10e-2
-
-# physical quantities
-M = 1/(2*G) 
-m = alpha * M
-mu = M*G
-
-radial_acc = lambda entity: ( - G*M/entity.rr**2 ) + (entity.rr - 3/2 * R_S) * (entity.l0**2)/(entity.rr**4)
-
-# physical integration 
-dt = 0.01
-T = 4
-nb_steps = int(T / dt)
-
-
-
-
 class Game():
     def __init__(self):
         
         self.sm = StateManager(state = {
             'canRun':False,
             'shouldExit':False,
-            'playerTurn':False,
+            'playerTurn':True,
 
             'playerCanShootHeavy': True,
             'playerCanShootLight': True,
@@ -75,7 +43,8 @@ class Game():
 
         # init pygame & scene
         pygame.init()
-        pygame.font.init() 
+        pygame.font.init()
+        pygame.display.set_caption(GAME_TITLE)
         self.scene = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # init some helper msgs 
@@ -137,46 +106,14 @@ Type `list [commands|variables]` to list all the commands/variables.`
     def init_text(self, txt: str, size = 34) -> pygame.Surface:
         font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), size)
         return font.render(txt, False, (217,0,210))
-    
-
-    def handle_player_shot(self):
-
-        self.sm.set('playerCanShootHeavy', self.player.nb_heavy_missile_left > 0)
-        self.sm.set('playerCanShootLight', self.player.nb_light_missile_left > 0)
-        
-        if(self.sm.get('playerShot')):
-            angle_input =  self.sm.get('playerShotAngle')
-
-
-            # Calculate the projectile's initial position relative to the player's current position and angle_input
-            xprojectile = self.player.x() + 20  * np.cos(self.player.rtheta + angle_input)
-            yprojectile = self.player.y() + 20  * np.sin(self.player.rtheta + angle_input)
-
-            # Convert the new projectile position back to polar coordinates for the game's system
-            rr = np.sqrt(xprojectile**2 + yprojectile**2)
-            rtheta = np.atan2(yprojectile, xprojectile)
-            
-            type_projectile = self.sm.get('playerShotType')
-            
-            if(type_projectile == 'heavy'):
-                projectile = HeavyProjectile(beta*m, rr, rtheta)
-                self.player.nb_heavy_missile_left -= 1
-            else:
-                projectile = LightProjectile(gamma*m, rr, rtheta)
-                self.player.nb_light_missile_left -= 1
-
-            self.entity_pool.add(projectile)
-
-            self.sm.set('playerShot', False)
-            self.sm.set('playerShotType', None)
-            self.sm.set('playerShotAngle', None)
 
 
     
     # dynamics & rendering
     def update_entities(self):
-
-        self.handle_player_shot()
+        projectile = self.player.handle_shoot_state(self.sm)
+        if(projectile):
+            self.entity_pool.add(projectile)
 
         # iterate over entities
         for entity in self.entity_pool.pool:
@@ -192,6 +129,10 @@ Type `list [commands|variables]` to list all the commands/variables.`
                 if(not other_current.palive or current.id == other_entity):
                     continue    
                 current.is_colliding_with(other_current)
+
+    def init_entities(self):
+        for entity in self.entity_pool.pool:
+            self.entity_pool.pool[entity].init()
 
                 
     def draw_scene(self):
@@ -215,12 +156,14 @@ Type `list [commands|variables]` to list all the commands/variables.`
         self.player.thetadot = angular_velocity / distance
 
 
-        self.target.rr = distance
+        self.target.rr = distance + 100
         self.target.rtheta = np.pi
-        self.target.rdot = radial_velocity
-        self.target.thetadot = angular_velocity / distance
+        self.target.rdot = -10
+        self.target.thetadot =  angular_velocity / distance
         
         self.draw_scene()
+
+        self.init_entities()
 
         while True:
             if(not self.sm.get('playerTurn')): # computer's turn
@@ -228,7 +171,7 @@ Type `list [commands|variables]` to list all the commands/variables.`
                 for _ in range(nb_steps):
                     self.update_entities()
                     self.draw_scene()
-                self.sm.set('playerTurn', True)
+                #self.sm.set('playerTurn', True)
 
             else: # player's turn
                 self.current_text = self.text_your_turn
