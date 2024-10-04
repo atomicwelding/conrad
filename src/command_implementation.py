@@ -135,7 +135,7 @@ commands = {
     },
     'set': {
         'command': set_command,
-        'use': '`set [distance (as multiple of variable)|angular_velocity|radial_velocity]`',
+        'use': '`set [distance (in unit of R_S)|angular_velocity|radial_velocity]`',
         'goal': 'set a value to a given variable'
     },
     'sdbg': {
