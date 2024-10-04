@@ -7,8 +7,6 @@ from BlackHole import BlackHole
 from Player import Player
 from EntityPool import EntityPool
 from Target import Target
-from HeavyProjectile import HeavyProjectile
-from LightProjectile import LightProjectile
 
 
 from params import * 
@@ -17,7 +15,6 @@ from params import *
 import numpy as np
 import pygame
 import threading
-import time
 import sys
 import os
 
@@ -50,6 +47,7 @@ class Game():
         # init some helper msgs 
         self.text_your_turn = self.init_text('Your turn!')
         self.text_computing = self.init_text('Computing new positions ...')
+        self.text_forwarding = self.init_text('Forwarding ...')
         self.text_you_won = self.init_text('You won')
         self.text_you_lose = self.init_text('You lose')
 
@@ -111,9 +109,16 @@ Type `list [commands|variables]` to list all the commands/variables.`
     
     # dynamics & rendering
     def update_entities(self):
-        projectile = self.player.handle_shoot_state(self.sm)
-        if(projectile):
-            self.entity_pool.add(projectile)
+
+        # player's shot
+        projectile_player = self.player.handle_shoot_state(self.sm)
+        if(projectile_player):
+            self.entity_pool.add(projectile_player)
+
+        # target
+        projectile_target = self.target.random_shoot()
+        if(projectile_target):
+            self.entity_pool.add(projectile_target)
 
         # iterate over entities
         for entity in self.entity_pool.pool:
@@ -129,7 +134,7 @@ Type `list [commands|variables]` to list all the commands/variables.`
                 if(not other_current.palive or current.id == other_entity):
                     continue    
                 current.is_colliding_with(other_current)
-
+                
     def init_entities(self):
         for entity in self.entity_pool.pool:
             self.entity_pool.pool[entity].init()
@@ -156,26 +161,31 @@ Type `list [commands|variables]` to list all the commands/variables.`
         self.player.thetadot = angular_velocity / distance
 
 
-        self.target.rr = distance + 100
+        self.target.rr = distance
         self.target.rtheta = np.pi
-        self.target.rdot = -10
+        self.target.rdot = radial_velocity
         self.target.thetadot =  angular_velocity / distance
         
         self.draw_scene()
 
+        # init states and entities
         self.init_entities()
+        self.sm.set('playerCanShootHeavy', self.player.nb_heavy_missile_left > 0)
+        self.sm.set('playerCanShootLight', self.player.nb_light_missile_left > 0)
 
         while True:
             if(not self.sm.get('playerTurn')): # computer's turn
-                self.current_text = self.text_computing
+                self.current_text = self.text_computing if self.player.has_ammo() else self.text_forwarding
+                self.target.canShoot = True
                 for _ in range(nb_steps):
                     self.update_entities()
+                    self.target.canShoot = False
                     self.draw_scene()
-                #self.sm.set('playerTurn', True)
+                if(self.player.has_ammo()): # forwarding if not
+                    self.sm.set('playerTurn', True)
 
             else: # player's turn
                 self.current_text = self.text_your_turn
-
 
             # exiting conditions
             if(not self.player.palive):
@@ -188,7 +198,6 @@ Type `list [commands|variables]` to list all the commands/variables.`
 
             self.draw_scene()
             self.should_game_exit()
-
 
             # event loop of pygame
             for event in pygame.event.get():

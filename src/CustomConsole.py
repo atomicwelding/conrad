@@ -7,12 +7,15 @@ import sys
 
  
 
-def command_handler2(command, state_manager: StateManager):
+def command_handler(command, state_manager: StateManager):
 
         all_commands = [key for key in commands]
 
-        parts = command.split()
-        command_name = parts[0]
+        try:
+                parts = command.split()
+                command_name = parts[0]
+        except IndexError:
+                return True
 
         if(not (command_name in all_commands)):
                 print("Please, use a defined command.")
@@ -40,7 +43,7 @@ class CustomConsole(code.InteractiveConsole):
         self.state_manager = state_manager
     
     def runsource(self, source, filename="<input>", symbol="single"):
-        if command_handler2(source.strip(), state_manager = self.state_manager):
+        if command_handler(source.strip(), state_manager = self.state_manager):
             return False  # Do not execute the command further
         return super().runsource(source, filename, symbol)
     

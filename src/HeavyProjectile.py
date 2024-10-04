@@ -1,4 +1,6 @@
 from Projectile import Projectile
+from LightProjectile import LightProjectile
+
 import numpy as np 
 
 
@@ -10,4 +12,16 @@ class HeavyProjectile(Projectile):
                          rr = rr,
                          rtheta = rtheta,
                          rdot = 0,
-                         thetadot = sign *  12. / rr)
+                         thetadot = sign * 12 / rr)
+
+
+        
+    def is_colliding_with(self, entity):
+        pcolliding = super().is_colliding_with(entity)
+
+        if(pcolliding and isinstance(entity, HeavyProjectile)):
+           self.assign_result_collisions(entity)
+
+        if(pcolliding and isinstance(entity, LightProjectile)):
+            self.assign_result_collisions(entity)
+ 

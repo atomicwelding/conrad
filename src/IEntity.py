@@ -82,17 +82,14 @@ class IEntity(ABC):
         self.rr += self.rdot * dt
         self.rdot += dt / 2 * radial_acceleration(self)
         
-        # boundaries --> special case of angles? how to treat them
-        # at the top right corner x = 181 y = 313
-        # it goes right to bottom left corner straight to top right again ... fucked up
         scw, sch = scene.get_size()
-        if(self.x() <= -scw/2 or self.y() <= -sch/2):
+
+        if(self.x() < -scw/2 or self.x() > scw/2
+           or self.y() < - sch/2 or self.y() > sch/2):
+            self.rr = scw/2
             self.rtheta += np.pi
             self.rdot *= -1
-        elif(self.x() >= scw/2 or self.y() >= sch/2):
-            self.rtheta -= np.pi
-            self.rdot *= -1
-
+            
             
     def draw(self, scene):
         scene.blit(self.surface, self.pyg_coords(scene))

@@ -10,4 +10,4 @@ class LightProjectile(Projectile):
                          rr = rr,
                          rtheta = rtheta,
                          rdot = 0,
-                         thetadot = sign * 30. / rr)
+                         thetadot = sign * 40 / rr)

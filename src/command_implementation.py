@@ -65,7 +65,7 @@ def set_command(state_manager: StateManager, arg1, arg2):
     else:
         try:
             if(arg1 == 'distance'):
-                state_manager.set('distance', float(arg2))
+                state_manager.set('distance', float(arg2) * R_S)
                             
             elif(arg1 == 'radial_velocity'):
                 state_manager.set('radial_velocity', float(arg2))
@@ -80,8 +80,8 @@ def set_command(state_manager: StateManager, arg1, arg2):
 
 def sdbg_command(state_manager: StateManager, arg1, arg2):
     state_manager.set('distance', 2 * R_S)
-    state_manager.set('angular_velocity', 20.0)
-    state_manager.set('radial_velocity', 0)
+    state_manager.set('angular_velocity', 30.0)
+    state_manager.set('radial_velocity', 30.)
 
 
 def shoot_command(state_manager: StateManager, arg1, arg2):
@@ -91,7 +91,6 @@ def shoot_command(state_manager: StateManager, arg1, arg2):
         if(not state_manager.get('playerTurn')):
                 print('Wait for your turn')
                 return
-
         
         if(arg1 not in ['heavy', 'light']):
                 print("Not a valid projectile type")

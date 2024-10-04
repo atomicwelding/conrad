@@ -17,9 +17,6 @@ class BlackHole(IEntity):
         pass
 
     def is_colliding_with(self, entity):
-        #if(super().is_colliding_with(entity)):
-         #   print("entity should be destroyed")
-
         pcolliding = super().is_colliding_with(entity)
 
         if(pcolliding and isinstance(entity, IEntity)):
