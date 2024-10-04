@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='conrad',
-    version='0.0.1',
+    version='1.0.0',
     description='A 2D space battle game around a black hole',
     url='https://github.com/atomicwelding/space-battle-black-hole',
     author='Erwan Le Doeuff (weld)',
