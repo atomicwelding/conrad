@@ -122,7 +122,7 @@ Type `list [commands|variables]` to list all the commands/variables.
         font = pygame.font.Font(os.path.join(ASSETS_PATH, 'golden-age.ttf'), size)
         return font.render(txt, False, (217, 0, 210))
 
-    def update_entities(self):
+    def update_scene(self):
         """
         Updates the positions and states of all entities in the game and checks for collisions.
         """
@@ -137,24 +137,10 @@ Type `list [commands|variables]` to list all the commands/variables.
             self.entity_pool.add(projectile_target)
 
         # Update all entities and check collisions
-        for entity in self.entity_pool.pool:
-            current = self.entity_pool.pool[entity]
-            if not current.palive:
-                continue
-            current.update(self.scene, radial_acc, dt)
+        self.entity_pool.update_entities(self.scene)
 
-            for other_entity in self.entity_pool.pool:
-                other_current = self.entity_pool.pool[other_entity]
-                if not other_current.palive or current.id == other_entity:
-                    continue
-                current.is_colliding_with(other_current)
 
-    def init_entities(self):
-        """
-        Initializes the entities in the game, setting up initial states.
-        """
-        for entity in self.entity_pool.pool:
-            self.entity_pool.pool[entity].init()
+
 
     def draw_scene(self):
         """
@@ -162,9 +148,7 @@ Type `list [commands|variables]` to list all the commands/variables.
         """
         self.scene.blit(self.background, (0, 0))
         self.scene.blit(self.current_text, (0, 0))
-        for entity in self.entity_pool.pool:
-            if self.entity_pool.pool[entity].palive:
-                self.entity_pool.pool[entity].draw(self.scene)
+        self.entity_pool.draw_entities(self.scene)
         pygame.display.flip()
 
     def gameloop(self):
@@ -187,7 +171,7 @@ Type `list [commands|variables]` to list all the commands/variables.
         self.target.thetadot = angular_velocity / distance
 
         self.draw_scene()
-        self.init_entities()
+        self.entity_pool.init_entities()
 
         # Set initial shooting ability
         self.sm.set('playerCanShootHeavy', self.player.nb_heavy_missile_left > 0)
@@ -198,7 +182,7 @@ Type `list [commands|variables]` to list all the commands/variables.
                 self.current_text = self.text_computing if self.player.has_ammo() else self.text_forwarding
                 self.target.canShoot = True
                 for _ in range(nb_steps):
-                    self.update_entities()
+                    self.update_scene()
                     self.target.canShoot = False
                     self.draw_scene()
                 if self.player.has_ammo():  # Forward to player if possible
