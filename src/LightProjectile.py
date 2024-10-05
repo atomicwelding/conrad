@@ -23,3 +23,12 @@ class LightProjectile(Projectile):
                          rtheta=rtheta,
                          rdot=0,
                          thetadot=sign * 40 / rr)
+
+
+    def is_colliding_with(self, entity):
+        pcolliding = super().is_colliding_with(entity)
+
+
+        if(pcolliding and isinstance(entity, LightProjectile)):
+            self.palive = False
+            entity.palive = False
