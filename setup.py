@@ -10,6 +10,7 @@ setup(
     author='Erwan Le Doeuff (weld)',
     author_email='erwan.le_doeuff@edu.univ-fcomte.fr',
     install_requires=[
-        'pygame'
+        'pygame',
+	'numpy'
     ],
 )
