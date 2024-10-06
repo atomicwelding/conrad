@@ -98,6 +98,7 @@ class IEntity(ABC):
     def draw(self, scene):
         scene.blit(self.surface, self.pyg_coords(scene))
 
+
     def is_colliding_with(self, entity) -> bool:
         rectA = self.surface.get_rect(center=(self.x(), self.y()))
         rectB = entity.surface.get_rect(center=(entity.x(), entity.y()))
@@ -108,14 +109,31 @@ class IEntity(ABC):
         T1, T2 = self.angular_velocity(), other.angular_velocity()
         v1, v2 = self.radial_velocity(), other.radial_velocity()
 
-        T1prime = np.atan(((m1 - m2) / (m1 + m2)) * np.tan(T1) + (2 * m2 / (m1 + m2)) * (v2 / v1) * np.sin(T2) / np.cos(T1))
-        v1prime = np.sqrt((((m1 - m2) / (m1 + m2)) * v1 * np.sin(T1) + (2 * m2 / (m1 + m2)) * v2 * np.sin(T2)) ** 2 + (v1 * np.cos(T1)) ** 2)
-        T2prime = np.atan(((m2 - m1) / (m1 + m2)) * np.tan(T2) + (2 * m1 / (m1 + m2)) * (v1 / v2) * np.sin(T1) / np.cos(T2))
-        v2prime = np.sqrt((((m2 - m1) / (m1 + m2)) * v2 * np.sin(T2) + (2 * m1 / (m1 + m2)) * v1 * np.sin(T1)) ** 2 + (v2 * np.cos(T2)) ** 2)
+        # Handle cases where either radial velocity is zero
+        if v1 == 0 and v2 == 0:
+            return  # No collision effect if both are stationary
 
+        if v1 == 0:
+            # Physically, object 1 gains velocity and direction based on the impact from object 2
+            T1prime = T2  # After collision, object 1 will follow the trajectory of object 2
+            v1prime = (2 * m2 / (m1 + m2)) * v2 * np.sin(T2)  # Gain velocity from object 2
+        else:
+            T1prime = np.atan(((m1 - m2) / (m1 + m2)) * np.tan(T1) + (2 * m2 / (m1 + m2)) * (v2 / v1) * np.sin(T2) / np.cos(T1))
+            v1prime = np.sqrt((((m1 - m2) / (m1 + m2)) * v1 * np.sin(T1) + (2 * m2 / (m1 + m2)) * v2 * np.sin(T2)) ** 2 + (v1 * np.cos(T1)) ** 2)
+
+        if v2 == 0:
+            # Physically, object 2 gains velocity and direction based on the impact from object 1
+            T2prime = T1  # After collision, object 2 will follow the trajectory of object 1
+            v2prime = (2 * m1 / (m1 + m2)) * v1 * np.sin(T1)  # Gain velocity from object 1
+        else:
+            T2prime = np.atan(((m2 - m1) / (m1 + m2)) * np.tan(T2) + (2 * m1 / (m1 + m2)) * (v1 / v2) * np.sin(T1) / np.cos(T2))
+            v2prime = np.sqrt((((m2 - m1) / (m1 + m2)) * v2 * np.sin(T2) + (2 * m1 / (m1 + m2)) * v1 * np.sin(T1)) ** 2 + (v2 * np.cos(T2)) ** 2)
+
+        # Update the radial and angular velocities
         self.rdot, self.thetadot = v1prime, T1prime / self.rr
         other.rdot, other.thetadot = v2prime, T2prime / other.rr
 
+        # Calculate the overlap and adjust positions if there's a collision
         distance = np.sqrt(self.rr**2 + other.rr**2 - 2 * self.rr * other.rr * np.cos(self.rtheta - other.rtheta))
         overlap_distance = self.radius() + other.radius() - distance
 
