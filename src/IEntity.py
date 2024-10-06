@@ -88,6 +88,7 @@ class IEntity(ABC):
         self.rr += self.rdot * dt
         self.rdot += dt / 2 * radial_acceleration(self)
 
+        # boundaries check
         scw, sch = scene.get_size()
         if (self.x() < -scw/2 or self.x() > scw/2
             or self.y() < - sch/2 or self.y() > sch/2):
