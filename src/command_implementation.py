@@ -11,13 +11,28 @@ def exit_command(state_manager: StateManager, arg1, arg2):
 def help_command(state_manager: StateManager, arg1, arg2):
     """Displays help information for commands."""
     if not arg1:
-        print("Manual not written yet")
+        print("You need to set the initial conditions before running the game:")
+        print("  set distance X")
+        print("  set radial_velocity Y")
+        print("  set angular_velocity Z")
+        print("Where (X, Y, Z) are floating-point numbers.")
+
+        print("\nWhen you run the game, a graphical scene appears, displaying a black hole and two ships. Yours is the blue one on the right. The target is on the opposite side.")
+        
+        print("\nThe game starts on your turn. You have three possibilities :")
+        print(" - You can wait for a better position, or shoot a projectile (heavy or light) with an angle.")
+        
+        print("\nHeavy projectiles cause elastic collisions, allowing you to propel yourself or push the target. Light projectiles are explosive and destroy the target if hit.")
+        
+        print("\nThe game ends when a ship is destroyed by a light projectile or falls into the black hole. If you run out of ammunition, the game forwards until one ship is destroyed.")
         return
 
+    # If a specific command is requested
     try:
-        print(commands[arg1]['use'] + " : " + commands[arg1]['goal'])
+        print(f"Usage: {commands[arg1]['use']}")
+        print(f"Description: {commands[arg1]['goal']}")
     except KeyError:
-        print("Command doesn't exist")
+        print("Command doesn't exist. Use `help` to list all available commands.")
 
 def list_command(state_manager: StateManager, arg1, arg2):
     """Lists available commands or variables."""
