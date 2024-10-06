@@ -12,7 +12,7 @@ NB_LIGHT_MISSILE = 2
 
 # physical constants
 G = 6.67*10e-11
-c = 1
+c = 1/100
 R_S = 100
 
 # scaling factors

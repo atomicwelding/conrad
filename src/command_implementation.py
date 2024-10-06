@@ -37,7 +37,7 @@ def run_command(state_manager: StateManager, arg1, arg2):
     angular_velocity = state_manager.get('angular_velocity')
     radial_velocity = state_manager.get('radial_velocity')
 
-    if all([distance, angular_velocity, radial_velocity]):
+    if distance != None and angular_velocity != None and radial_velocity != None:
         state_manager.set('canRun', True)
     else:
         print('Please, set distance, angular_velocity, and radial_velocity before running the game.')
@@ -60,11 +60,11 @@ def set_command(state_manager: StateManager, arg1, arg2):
     except ValueError:
         print('Value not valid. Please, use a number.')
 
-def sdbg_command(state_manager: StateManager, arg1, arg2):
-    """Debugging command to set predefined values for game variables."""
+def set_default_command(state_manager: StateManager, arg1, arg2):
+    """Set default values for game variables"""
     state_manager.set('distance', 2 * R_S)
-    state_manager.set('angular_velocity', 30.0)
-    state_manager.set('radial_velocity', 30.)
+    state_manager.set('angular_velocity', 0.03 * c)
+    state_manager.set('radial_velocity', 0 * c)
 
 def shoot_command(state_manager: StateManager, arg1, arg2):
     """Handles shooting action, checking ammo availability and setting shot parameters."""
@@ -135,13 +135,13 @@ commands = {
     },
     'set': {
         'command': set_command,
-        'use': '`set [distance (in unit of R_S)|angular_velocity|radial_velocity]`',
+        'use': '`set [distance (in unit of R_S)|angular_velocity (in percent of c)|radial_velocity (in percent of c)]`',
         'goal': 'set a value to a given variable'
     },
-    'sdbg': {
-        'command': sdbg_command,
-        'use': '`sdbg`',
-        'goal': 'debugging purpose only'
+    'set_default': {
+        'command': set_default_command,
+        'use': '`set_default`',
+        'goal': 'Set default values for game variables.'
     },
     'shoot': {
         'command': shoot_command,
